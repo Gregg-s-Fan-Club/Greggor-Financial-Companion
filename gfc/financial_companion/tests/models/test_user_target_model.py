@@ -60,3 +60,4 @@ class UserTargetModelTestCase(ModelTestCase):
 
     def test_get_str_function(self) -> None:
         self.assertEqual(self.test_model.__str__(), "personal target")
+        
