@@ -105,10 +105,10 @@ class ParseStatementPDF:
     def get_dataframe_list_statement_column_expense_indexes(
             self, statement_dataframe_list: list[pd.DataFrame]) -> tuple[int, int, bool]:
         """Checks if income and expense fields are separate or together"""
-        if pd.isna(statement_dataframe_list[0].iloc[0][-3]) or re.sub(self.number_regex, '',
-                                                                      statement_dataframe_list[0].iloc[0][-3])[1:].replace(".", "", 1).replace("-", "", 1).isnumeric():
+        if pd.isna(statement_dataframe_list[0].iloc[0].iloc[-3]) or re.sub(self.number_regex, '',
+                                                                      statement_dataframe_list[0].iloc[0].iloc[-3])[1:].replace(".", "", 1).replace("-", "", 1).isnumeric():
             return -3, -2, False
-        if not pd.isna(statement_dataframe_list[0].iloc[0][-2]) and re.sub(self.number_regex, '', statement_dataframe_list[0].iloc[0][-2])[
+        if not pd.isna(statement_dataframe_list[0].iloc[0].iloc[-2]) and re.sub(self.number_regex, '', statement_dataframe_list[0].iloc[0].iloc[-2])[
                 1:].replace(".", "", 1).replace("-", "", 1).isnumeric():
             return -2, -2, False
 
@@ -159,34 +159,34 @@ class ParseStatementPDF:
         """Updates object date data if statement dataframe row date block is understandable"""
         try:
             self.date: datetime = pd.to_datetime(dparser.parse(str(
-                statement_dataframe_row[indexes["date"]]), fuzzy=True), infer_datetime_format=True)
+                statement_dataframe_row.iloc[indexes["date"]]), fuzzy=True))
         except Exception:
             pass
 
     def set_balance_from_datataframe_row(
             self, statement_dataframe_row: list[Any], indexes: dict[str, int]) -> None:
         """Updates object balance data if statement dataframe row balance block is not empty"""
-        if not pd.isna(statement_dataframe_row[indexes["balance"]]):
+        if not pd.isna(statement_dataframe_row.iloc[indexes["balance"]]):
             self.balance: float = float(re.sub(self.number_regex, '', str(
-                statement_dataframe_row[indexes["balance"]])))
+                statement_dataframe_row.iloc[indexes["balance"]]))) 
 
     def set_amount_and_transaction_type_from_datataframe_row(
             self, statement_dataframe_row: list[Any], indexes: dict[str, int]) -> None:
         """Updates amount and transaction type data if statement dataframe row income or expense block is valid"""
-        if not pd.isna(statement_dataframe_row[indexes["income"]]) and float(re.sub(
-                self.number_regex, '', str(statement_dataframe_row[indexes["income"]]))) >= 0:
+        if not pd.isna(statement_dataframe_row.iloc[indexes["income"]]) and float(re.sub(
+                self.number_regex, '', str(statement_dataframe_row.iloc[indexes["income"]]))) >= 0:
             self.amount: float = abs(float(re.sub(self.number_regex, '', str(
-                statement_dataframe_row[indexes["income"]]))))
+                statement_dataframe_row.iloc[indexes["income"]]))))
             self.transaction_type: str = TransactionType.INCOME
-        elif not pd.isna(statement_dataframe_row[indexes["expense"]]):
+        elif not pd.isna(statement_dataframe_row.iloc[indexes["expense"]]):
             self.amount: float = abs(float(re.sub(self.number_regex, '', str(
-                statement_dataframe_row[indexes["expense"]]))))
+                statement_dataframe_row.iloc[indexes["expense"]]))))
             self.transaction_type: str = TransactionType.EXPENSE
 
     def set_description_from_datataframe_row(
             self, statement_dataframe_row: list[Any], indexes: dict[str, int]) -> None:
         """Updates object description data if statement dataframe row descritiption block is not empty"""
-        description: str = statement_dataframe_row[indexes["description"]]
+        description: str = statement_dataframe_row.iloc[indexes["description"]]
         if not pd.isna(description) and description.lower(
         ) not in self.ignore_in_description:
             if self.description is None:

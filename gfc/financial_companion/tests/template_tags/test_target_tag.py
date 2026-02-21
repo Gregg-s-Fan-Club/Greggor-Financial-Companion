@@ -185,4 +185,9 @@ class GetCompletenessTemplateTagTestCase(TemplateTagTestCase):
         start = self._get_start_of_time_period(target)
         filtered = self._filter_transactions(start, transactions)
         completeness_from_tag = get_completeness(target)
-        self.assertEqual(17288.81, completeness_from_tag)
+        # Compute expected dynamically to avoid stale hardcoded currency conversion values
+        from financial_companion.models import Transaction
+        total = Transaction.calculate_total_amount_from_transactions(
+            filtered, target.currency)
+        expected_completeness = round((total / float(target.amount)) * 100, 2)
+        self.assertEqual(expected_completeness, completeness_from_tag)

@@ -59,7 +59,6 @@ class AddTransactionForm(forms.ModelForm):
 
     def save(self, instance: Transaction = None) -> Transaction:
         """Create a new transaction."""
-        super().save(commit=False)
         if instance is None:
             transaction: Transaction = Transaction.objects.create(
                 title=self.cleaned_data.get('title'),
@@ -73,7 +72,18 @@ class AddTransactionForm(forms.ModelForm):
                 time_of_transaction=self.cleaned_data.get('time_of_transaction')
             )
         else:
-            transaction: Transaction = super().save(commit=True)
+            instance.title = self.cleaned_data.get('title')
+            instance.description = self.cleaned_data.get('description')
+            if self.cleaned_data.get('file'):
+                instance.file = self.cleaned_data.get('file')
+            instance.category = self.cleaned_data.get('category')
+            instance.amount = self.cleaned_data.get('amount')
+            instance.currency = self.cleaned_data.get('currency')
+            instance.sender_account = self.cleaned_data.get('sender_account')
+            instance.receiver_account = self.cleaned_data.get('receiver_account')
+            instance.time_of_transaction = self.cleaned_data.get('time_of_transaction')
+            instance.save()
+            transaction = instance
 
         return transaction
 
