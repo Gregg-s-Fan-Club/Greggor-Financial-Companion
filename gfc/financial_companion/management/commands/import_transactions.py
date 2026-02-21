@@ -5,8 +5,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction as db_transaction
 
-# ✅ Adjust these imports to your project
-from financial_companion.models import Transaction, Account  # <-- change this
+from financial_companion.models import Transaction, Account
 
 
 REQUIRED_HEADERS = {"title", "description", "amount", "send", "receive"}
