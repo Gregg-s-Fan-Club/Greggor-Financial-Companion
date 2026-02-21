@@ -23,7 +23,7 @@ from django.dispatch import receiver
 from decimal import Decimal
 from django.db.models import Q
 from financial_companion.models import User
-
+from django.utils import timezone
 
 def change_filename(instance, filename: str) -> str:
     """Returns filepath with random filename for file to be stored"""
@@ -89,15 +89,15 @@ class AbstractTransaction(Model):
 
     class Meta:
         abstract: bool = True
-        unique_together: list[str] = ['sender_account', 'receiver_account']
+        unique_together: list[str] = ['sender_account', 'receiver_account', 'amount']
 
 
 class Transaction(AbstractTransaction):
     """Concrete model for a generic transaction"""
 
     time_of_transaction: DateTimeField = DateTimeField(
-        blank=False,
-        auto_now_add=True
+        default=timezone.now,
+        blank=False
     )
 
     @staticmethod
