@@ -7,7 +7,8 @@ from django.db.models import (
     DateField,
     ForeignKey,
     ManyToManyField,
-    CASCADE, SET_NULL
+    CASCADE, SET_NULL,
+    Index
 )
 
 from django.core.validators import MinValueValidator
@@ -90,6 +91,13 @@ class AbstractTransaction(Model):
     class Meta:
         abstract: bool = True
         unique_together: list[str] = ['sender_account', 'receiver_account', 'amount']
+        ordering = ["-time_of_transaction"]
+        indexes = [
+            Index(fields=["sender_account", "-time_of_transaction"]),
+            Index(fields=["receiver_account", "-time_of_transaction"]),
+            Index(fields=["category", "-time_of_transaction"]),
+            Index(fields=["-time_of_transaction"]),
+        ]
 
 
 class Transaction(AbstractTransaction):
@@ -250,6 +258,12 @@ class RecurringTransaction(AbstractTransaction):
 
     class Meta:
         ordering: list[str] = ['-interval']
+        indexes = [
+            Index(fields=["sender_account"]),
+            Index(fields=["receiver_account"]),
+            Index(fields=["start_date"]),
+            Index(fields=["end_date"]),
+        ]
 
     def add_transaction(self, transaction: Transaction) -> None:
         """Add transaction to transaction in recurring transaction"""

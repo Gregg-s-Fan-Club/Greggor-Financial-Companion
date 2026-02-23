@@ -16,3 +16,9 @@ class Category(models.Model):
             fcmodels.Transaction.objects.filter(category=self)))
         return sorted(
             transactions, key=lambda transaction: transaction.time_of_transaction, reverse=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["user", "name"])
+        ]

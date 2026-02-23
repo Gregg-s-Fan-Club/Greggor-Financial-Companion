@@ -3,7 +3,8 @@ from django.db.models import (
     CharField,
     ForeignKey,
     DecimalField,
-    CASCADE
+    CASCADE,
+    Index
 )
 from encrypted_fields.fields import EncryptedCharField
 from django.core.exceptions import ValidationError
@@ -31,6 +32,12 @@ class Account(Model):
     )
 
     user: ForeignKey = ForeignKey(User, on_delete=CASCADE)
+
+    class Meta:
+        indexes = [
+            Index(fields=["user"]),
+            Index(fields=["user", "name"]),
+        ]
 
     objects: InheritanceManager = InheritanceManager()
 
