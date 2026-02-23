@@ -7,10 +7,23 @@ from django.utils.timezone import make_aware
 from typing import Any
 from decimal import Decimal
 from django.db.models import QuerySet
+from django.utils import timezone
 
 
 class AddTransactionForm(forms.ModelForm):
     """Form to add a new transaction"""
+
+    time_of_transaction = forms.DateTimeField(
+        required=True,
+        initial=timezone.now,
+        widget=forms.DateTimeInput(
+            attrs={
+                "type": "datetime-local",
+                "class": "form-control"
+            },
+            format="%Y-%m-%dT%H:%M"
+        )
+    )
 
     def __init__(self, user, *args, **kwargs):
         super(AddTransactionForm, self).__init__(*args, **kwargs)
@@ -24,6 +37,8 @@ class AddTransactionForm(forms.ModelForm):
         self.fields['sender_account'].label_from_instance: str = self.label_from_instance
         self.fields['receiver_account'].label_from_instance: str = self.label_from_instance
         self.user: User = user
+
+        self.fields["time_of_transaction"].input_formats = ["%Y-%m-%dT%H:%M"]
 
     def label_from_instance(self, obj) -> str:
         """Return objects name"""
@@ -39,11 +54,11 @@ class AddTransactionForm(forms.ModelForm):
             'amount',
             'currency',
             'sender_account',
-            'receiver_account']
+            'receiver_account',
+            'time_of_transaction',]
 
     def save(self, instance: Transaction = None) -> Transaction:
         """Create a new transaction."""
-        super().save(commit=False)
         if instance is None:
             transaction: Transaction = Transaction.objects.create(
                 title=self.cleaned_data.get('title'),
@@ -53,10 +68,22 @@ class AddTransactionForm(forms.ModelForm):
                 amount=self.cleaned_data.get('amount'),
                 currency=self.cleaned_data.get('currency'),
                 sender_account=self.cleaned_data.get('sender_account'),
-                receiver_account=self.cleaned_data.get('receiver_account')
+                receiver_account=self.cleaned_data.get('receiver_account'),
+                time_of_transaction=self.cleaned_data.get('time_of_transaction')
             )
         else:
-            transaction: Transaction = super().save(commit=True)
+            instance.title = self.cleaned_data.get('title')
+            instance.description = self.cleaned_data.get('description')
+            if self.cleaned_data.get('file'):
+                instance.file = self.cleaned_data.get('file')
+            instance.category = self.cleaned_data.get('category')
+            instance.amount = self.cleaned_data.get('amount')
+            instance.currency = self.cleaned_data.get('currency')
+            instance.sender_account = self.cleaned_data.get('sender_account')
+            instance.receiver_account = self.cleaned_data.get('receiver_account')
+            instance.time_of_transaction = self.cleaned_data.get('time_of_transaction')
+            instance.save()
+            transaction = instance
 
         return transaction
 

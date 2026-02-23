@@ -65,8 +65,9 @@ class Transaction(admin.ModelAdmin):
     list_display: list[str] = [
         'id', 'title', 'amount', 'currency', 'sender_account', 'receiver_account', 'category', 'description', 'time_of_transaction'
     ]
-
-
+    list_editable: list[str] = [
+        'title', 'amount', 'currency', 'sender_account', 'receiver_account', 'category', 'description', 'time_of_transaction'
+    ]
 @admin.register(CategoryTarget)
 class CategoryTarget(admin.ModelAdmin):
     """Configuration of the admin interface for Category Targets"""

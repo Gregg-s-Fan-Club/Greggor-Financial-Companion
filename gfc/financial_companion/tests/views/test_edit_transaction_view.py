@@ -26,6 +26,7 @@ class EditTransactionViewTestCase(ViewTestCase):
             "currency": "USD",
             "sender_account": 1,
             "receiver_account": 3,
+            "time_of_transaction": "2023-01-15T10:30",
         }
         self.user: User = User.objects.get(username='@johndoe')
 

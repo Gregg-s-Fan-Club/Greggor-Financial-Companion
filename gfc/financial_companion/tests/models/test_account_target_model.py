@@ -52,12 +52,12 @@ class AccountTargetModelTestCase(ModelTestCase):
         self.assertEqual(self.test_model.is_complete(), False)
 
     def test_get_model_name_function_when_plural_is_false(self) -> None:
-        self.assertEquals(self.test_model.get_model_name(), "account")
+        self.assertEqual(self.test_model.get_model_name(), "account")
 
     def test_get_model_name_function_when_plural_is_true(self) -> None:
-        self.assertEquals(
+        self.assertEqual(
             self.test_model.get_model_name(
                 plural=True), "accounts")
 
     def test_get_str_function(self) -> None:
-        self.assertEquals(self.test_model.__str__(), "ghi")
+        self.assertEqual(self.test_model.__str__(), "ghi")

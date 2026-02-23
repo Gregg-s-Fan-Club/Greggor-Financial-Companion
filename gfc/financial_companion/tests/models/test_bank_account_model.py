@@ -154,4 +154,4 @@ class BankAccountModelTestCase(ModelTestCase):
             iban="GB12345678901234567"
         )
         self._assert_model_is_valid()
-        self.assertEquals(0, default_interest_zero_bank_model.interest_rate)
+        self.assertEqual(0, default_interest_zero_bank_model.interest_rate)

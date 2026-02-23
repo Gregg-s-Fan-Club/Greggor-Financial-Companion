@@ -21,6 +21,7 @@ class AddTransactionFormTestCase(FormTestCase):
             "currency": "USD",
             "sender_account": 1,
             "receiver_account": 3,
+            "time_of_transaction": "2023-01-15T10:30",
         }
 
     def test_form_contains_required_fields(self):
@@ -105,6 +106,7 @@ class AddTransactionFormTestCase(FormTestCase):
     def test_form_must_save_correctly(self):
         form: AddTransactionForm = AddTransactionForm(
             self.user, data=self.form_input)
+        self.assertTrue(form.is_valid())
         before_count: int = Transaction.objects.count()
         transaction: Transaction = form.save()
         after_count: int = Transaction.objects.count()
@@ -132,6 +134,7 @@ class AddTransactionFormTestCase(FormTestCase):
         old_transaction: Transaction = Transaction.objects.get(id=2)
         form: AddTransactionForm = AddTransactionForm(
             self.user, data=self.form_input, instance=old_transaction)
+        self.assertTrue(form.is_valid())
         before_count: int = Transaction.objects.count()
         new_transaction: Transaction = form.save(instance=old_transaction)
         after_count: int = Transaction.objects.count()
@@ -154,9 +157,9 @@ class AddTransactionFormTestCase(FormTestCase):
         form: AddTransactionForm = AddTransactionForm(
             self.user, data=self.form_input)
         self.assertFalse(form.is_valid())
-        self.assertEquals(
+        self.assertEqual(
             form.errors['receiver_account'][0],
             "Neither the sender or reciever are accounts with a balance to track.")
-        self.assertEquals(
+        self.assertEqual(
             form.errors['sender_account'][0],
             "Neither the sender or reciever are accounts with a balance to track.")

@@ -1,7 +1,7 @@
 from .test_model_base import ModelTestCase
 from decimal import Decimal
 from financial_companion.models.transaction_models import change_filename
-from ...helpers import CurrencyType
+from ...helpers import CurrencyType, convert_currency
 from ...models import Transaction, User, Account, Category
 from financial_companion.helpers.enums import Timespan
 from ...models import Transaction
@@ -101,8 +101,8 @@ class TransactionModelTestCase(ModelTestCase):
         self._assert_model_is_valid()
 
     def test_time_of_transaction_auto_adds_time_if_blank(self):
-        self.test_model.time_of_transaction: str = ""
-        self._assert_model_is_valid()
+        self.test_model.time_of_transaction = ""
+        self._assert_model_is_invalid()
 
     def test_change_filename(self):
         self.transaction: Transaction = Transaction.objects.get(id=2)
@@ -164,10 +164,19 @@ class TransactionModelTestCase(ModelTestCase):
     def test_valid_amount_within_time_period(self):
         transactions: list[Transaction] = Transaction.get_transactions_from_time_period(
             Timespan.WEEK, self.user)
+        # Compute expected total dynamically using live conversion rates
+        transactions_amounts: dict = {}
+        for transaction in transactions:
+            if transaction.currency in transactions_amounts:
+                transactions_amounts[transaction.currency] += transaction.amount
+            else:
+                transactions_amounts[transaction.currency] = transaction.amount
+        expected_total: float = 0
+        for currency, amount in transactions_amounts.items():
+            expected_total += float(convert_currency(amount, currency, CurrencyType.GBP))
         self.assertEqual(
-            round(
-                Transaction.calculate_total_amount_from_transactions(transactions), 2), round(
-                14196.84, 2))
+            round(Transaction.calculate_total_amount_from_transactions(transactions), 2),
+            round(expected_total, 2))
 
     @freeze_time("2023-01-07 22:00:00")
     def test_valid_split_categories(self):

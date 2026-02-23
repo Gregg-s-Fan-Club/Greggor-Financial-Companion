@@ -3,7 +3,8 @@ from django.db.models import (
     CharField,
     DecimalField,
     ForeignKey,
-    CASCADE
+    CASCADE,
+    Index
 )
 
 from django.core.validators import MinValueValidator
@@ -70,6 +71,9 @@ class CategoryTarget(AbstractTarget):
 
     class Meta:
         unique_together: list[str] = ["target_type", "timespan", "category"]
+        indexes = [
+            Index(fields=["category"]) 
+        ]
 
     def get_model_name(self, plural: bool = False) -> str:
         """Get model name with pluralisation if necessary"""
@@ -89,6 +93,9 @@ class UserTarget(AbstractTarget):
 
     class Meta:
         unique_together: list[str] = ["target_type", "timespan", "user"]
+        indexes = [
+            Index(fields=["user"])
+        ]
 
     def get_model_name(self, plural: bool = False) -> str:
         """Get model name with pluralisation if necessary"""
@@ -108,6 +115,9 @@ class AccountTarget(AbstractTarget):
 
     class Meta:
         unique_together: list[str] = ["target_type", "timespan", "account"]
+        indexes = [
+            Index(fields=["account"])
+        ]
 
     def get_model_name(self, plural: bool = False) -> str:
         """Get model name with pluralisation if necessary"""
